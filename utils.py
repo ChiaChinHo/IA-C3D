@@ -7,17 +7,10 @@ from scipy.misc import imread, imresize, imsave
 
 # UCF101 frame shape (240, 320, 3)#
 
-HEIGHT = 128
-WIDTH = 171
 FRAMES = 16
 RE_SIZE = 240 
 CROP_SIZE = 112 
 CHANNELS = 3
-BATCH_SIZE = 16 
-
-num_class=24
-
-frame_dir = '/home/ccho/Documents/Data/UCF101/frames/'
 
 #####################################
 # Video Processing Utilities
@@ -99,7 +92,7 @@ def centercrop(scale, size=(128, 171)):
 
     return off_h, off_h + scale, off_w, off_w + scale
 
-def read_train(tr_file):
+def read_train(tr_file, frame_dir):
     path, _, cls = tr_file.split(' ')
     frm = len([f for f in os.listdir(os.path.join(frame_dir, path)) if '.jpg' in f])
     start = np.random.randint(int(frm) - FRAMES)
@@ -116,7 +109,7 @@ def read_train(tr_file):
 
     return voxel, np.float32(cls)
 
-def read_test(tst_file):
+def read_test(tst_file, frame_dir):
     path, start, cls = tst_file.split(' ')
     start = int(start)
 

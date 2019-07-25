@@ -20,6 +20,8 @@ parser.add_argument('-t', '--trainingfile', type=str,
                     help='data list')
 parser.add_argument('-p', '--path', type=str,
                     help='data path')
+parser.add_argument('-n', '--num', type=int, default=24,
+                    help='number of classes')
 
 args = parser.parse_args()
 
@@ -27,18 +29,15 @@ os.environ['CUDA_VISIBLE_DEVICES'] = '0'
 
 # UCF101 frame shape (240, 320, 3)#
 
-HEIGHT = 128
-WIDTH = 171
 FRAMES = 16
-RE_SIZE = 240 
 CROP_SIZE = 112 
 CHANNELS = 3
 BATCH_SIZE = 16 
 
-num_class=24
+num_class=args.num
+frame_dir = args.path
 
 trainingfile = os.path.join(args.trainingfile, 'train.txt')
-print(trainingfile)
 
 # Demo of training on UCF101
 with open(trainingfile, 'r') as f:
@@ -56,18 +55,13 @@ training = tf.placeholder(tf.bool, name='training')
 
 # Define the C3D model for UCF101
 inputs = x - tf.constant([96.6], dtype=tf.float32, shape=[1, 1, 1, 1, 1])
-#inputs = tf.scalar_mul(2/255.0, x) - tf.constant([1.0], dtype=tf.float32, shape=[1, 1, 1, 1, 1])
 logits, [y_att_1, _, _] = c3d(inputs=inputs, num_class=num_class, training=training)
 labels = tf.one_hot(y, num_class, name='labels')
 
 def acc_func(logits, labels=labels, y=y):
     if len(logits.get_shape().as_list()) > 2:
         logits = tf.reduce_mean(tf.nn.softmax(y_att_1), axis=1)
-        #logits = tf.reduce_mean(tf.nn.relu(logits), axis=1)
-        #logits = tf.reduce_mean(logits, axis=1)
-        #_, T, c = logits.get_shape().as_list()
-        #y = tf.reshape(y, [-1, 1])
-        #y = tf.tile(y, [1, T]) 
+
 
     correct_opt = tf.equal(tf.argmax(logits, -1), y, name='correct')
     return tf.reduce_mean(tf.cast(correct_opt, tf.float32), name='accuracy')
@@ -87,8 +81,6 @@ with tf.variable_scope('final'):
 # Define loss function
 def loss_func(logits, labels=labels, name='loss'):
     if len(logits.get_shape().as_list()) > 2:
-        #logits = tf.reduce_sum(tf.nn.relu(logits), axis=1)
-        #logits = tf.reduce_sum(logits, axis=1)
         _, T, c = logits.get_shape().as_list()
         labels = tf.reshape(labels, [-1, 1, c])
         labels = tf.tile(labels, [1, T, 1]) 
@@ -151,7 +143,7 @@ if args.mode == 'train_main':
             total_acc = []
             n_train = len(tr_files)
             for idx, tr_file in enumerate(tr_files):
-                voxel, cls = read_train(tr_file)
+                voxel, cls = read_train(tr_file, frame_dir)
                 
                 batch_x[bidx] = voxel
                 batch_y[bidx] = cls
@@ -181,7 +173,7 @@ if args.mode == 'train_main':
             total_acc = []
             n_train = len(val_files)
             for idx, val_file in enumerate(val_files):
-                voxel, cls = read_train(val_file)
+                voxel, cls = read_train(val_file, frame_dir)
                 
                 batch_x[bidx] = voxel
                 batch_y[bidx] = cls
@@ -234,7 +226,7 @@ elif args.mode == 'train_subnet':
             n_train = len(tr_files)
 
             for idx, tr_file in enumerate(tr_files):
-                voxel, cls = read_train(tr_file)
+                voxel, cls = read_train(tr_file, frame_dir)
                 
                 batch_x[bidx] = voxel
                 batch_y[bidx] = cls
@@ -272,7 +264,7 @@ elif args.mode == 'train_subnet':
 
             n_train = len(val_files)
             for idx, val_file in enumerate(val_files):
-                voxel, cls = read_train(val_file)
+                voxel, cls = read_train(val_file, frame_dir)
                 
                 batch_x[bidx] = voxel
                 batch_y[bidx] = cls
