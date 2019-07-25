@@ -12,8 +12,7 @@ We combine 3D convolutional kernels, and attention mechanism to propose an appro
 ## Arguments and Commands
 
 - Training <br/>
-usage: main.py [-h] [-m MODE] [-t TRAININGFILE] [-p PATH] [-n NUM]
-
+usage: main.py [-h] [-m MODE] [-t TRAININGFILE] [-p PATH] [-n NUM] <br/>
 optional arguments: <br/>
   -h, --help            show this help message and exit <br/>
   -m MODE, --mode MODE  training mode <br/>
