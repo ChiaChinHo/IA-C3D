@@ -22,6 +22,16 @@ optional arguments: <br/>
   -n NUM, --num NUM     number of classes <br/>
 
 - Test
+usage: test.py [-h] [-t TESTFILE] [-p PATH] [-n NUM] [-th THRESHOLD] <br/>
+optional arguments: <br/>
+  -h, --help            show this help message and exit <br/>
+  -t TESTFILE, --testfile TESTFILE <br/>
+                        data list <br/>
+  -p PATH, --path PATH  data path <br/>
+  -n NUM, --num NUM     number of classes <br/>
+  -th THRESHOLD, --threshold THRESHOLD <br/>
+                        threshold <br/>
+
 
 ## C3D pretrained model from 
 https://github.com/tqvinhcs/C3D-tensorflow <br/>
